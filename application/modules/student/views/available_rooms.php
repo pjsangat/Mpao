@@ -296,7 +296,7 @@
         return false;
     }
 
-    function myfunction(rent_space_id, reservation_id)
+    function myfunction(rent_space_id, reservation_id, room_type_id)
     {
         //alert(rent_space_id);
         $.post('<?php echo base_url(); ?>student/get_compute',
@@ -306,11 +306,24 @@
                 },
         function(data) {
             $('#computation_' + rent_space_id).html(data);
+            if(room_type_id !== undefined){
+                get_sub_total(room_type_id);                
+            }
+            
         });
         return false;
     }
+    
+    function get_sub_total(room_type_id){
+        
+        $.get('<?php echo base_url(); ?>student/get_sub_total/'+room_type_id,{},
+        function(data) {
+            $('#sub-total-' + room_type_id).html(data);
+        });
+        return false;
+    }       
 
-    function get_others(rent_space_id, reservation_id)
+    function get_others(rent_space_id, reservation_id, room_type_id)
     {
         $.post('<?php echo base_url(); ?>student/get_compute_others',
                 {
@@ -319,6 +332,10 @@
                 },
         function(data) {
             $('#computation_others_' + rent_space_id).html(data);
+            
+            if(room_type_id !== undefined){
+                get_sub_total(room_type_id);
+            }
         });
         return false;
     }
@@ -467,7 +484,7 @@
                                     <input type="hidden" name="gender_guest" id="gender_guest" value="<?php echo $ai->gender_id; ?>" />
                                     <?php if ($ai->gender_id == '1') { ?>
                                         <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>');
-                                                return false;">
+                                                        return false;">
                                             <option selected="selected">Select</option>
                                             <?php
                                             for ($x = 1; $x <= $count; $x++) {
@@ -486,7 +503,7 @@
                                 <td >
                                     <?php if ($ai->gender_id == '2') { ?>
                                         <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>');
-                                        return false;">
+                                                        return false;">
                                             <option selected="selected">Select</option>
                                             <?php
                                             for ($x = 1; $x <= $count; $x++) {
@@ -504,7 +521,7 @@
                             </center></td>
                             </tr>
                             <tr>
-                                <td colspan="5" class=""><div id="computation_<?php echo $ai->rentspace_ID; ?>"></div><script>myfunction('<?php echo $ai->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>');</script></td>
+                                <td colspan="5" class=""><div id="computation_<?php echo $ai->rentspace_ID; ?>"></div><script>myfunction('<?php echo $ai->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $ai->room_type_id; ?>');</script></td>
                             </tr>
                         </form> 
                         <?php
@@ -516,6 +533,12 @@
             <!-- /.table-responsive --> 
         </div>
         <!-- /.panel-body -->
+
+        <div class="panel-body">
+            <div class="table-responsive" id="sub-total-1">
+                
+            </div>
+        </div>
     </div>
 </div>
 <!-- /.panel -->
@@ -572,7 +595,7 @@
                                         //}
                                         ?>
                                         <select id="number_of_person" name="number_of_person" class="form-control" onchange="nonaircon(this.form);
-                        return false;">
+                                                    return false;">
                                             <option selected="selected">Select</option>
                                             <?php for ($x = 0; $x <= 20; $x++) { ?>
                                                 <option value="<?php echo $x; ?>"><?php echo $x; ?></option>
@@ -653,8 +676,8 @@
                                 </td>
                                 <td >
 
-                                    <select id="no_of_person" name="no_of_person" class="form-control" onchange="otherfacility(this.form, '<?php echo $otherf->rentspace_ID; ?>');
-                            return false;">
+                                    <select id="no_of_person" name="no_of_person" class="form-control" onchange="otherfacility(this.form, '<?php echo $otherf->rentspace_ID; ?>', '<?php echo $otherf->room_type_id; ?>');
+                                                return false;">
                                         <option selected="selected">Select No of Person</option>
                                         <?php for ($x = 1; $x <= $otherf->No_person_Max; $x++) { ?>
                                             <option value="<?php echo $x; ?>"><?php echo $x; ?></option>
@@ -664,7 +687,7 @@
                             </tr>
                             <tr>
                                 <td colspan="5" class="">
-                                    <div id="computation_others_<?php echo $otherf->rentspace_ID; ?>"></div><script>get_others('<?php echo $otherf->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>');</script>
+                                    <div id="computation_others_<?php echo $otherf->rentspace_ID; ?>"></div><script>get_others('<?php echo $otherf->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $otherf->room_type_id; ?>');</script>
                                 </td>
                             </tr>
                         </form> 
@@ -673,17 +696,36 @@
                     ?>
                     </tbody>
                 </table>
-
-                <table class="table table-bordered">
-                    <tr>
-                        <td>Grand Total:</td>
-                        <td><div id="grand_total"></div></td>
-                    </tr>
-                </table>
             </div>
             <!-- /.table-responsive --> 
         </div>
         <!-- /.panel-body --> 
+        
+        
+        <div class="panel-body">
+            <div class="table-responsive" id="sub-total-3">
+                
+            </div>
+        </div>
+        
+        <div class="panel-body">
+            <div class="table-responsive" id="grand-total">
+                <table class="table">
+                    <tr class="bg-success">
+                        <td class="col-md-4"><strong>Grand Total</strong></td>
+                        <td class="col-md-4"></td>
+                        <td class="col-md-1" style="text-align: center">
+                        </td>
+                        <td class="col-md-1 text-center"></td>
+                        <td class="col-md-1 text-center">
+                            <strong>P<span id="grand_total"></span></strong>
+                        </td>
+                        <td class="col-md-1 text-center">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
     <!-- /.panel -->
 </div>
