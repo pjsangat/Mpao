@@ -17,7 +17,7 @@
             	
             </td>
             <td class="col-md-1 text-center">
-            	<button type="button" class="btn btn-xs btn-danger" onclick="delete_pending('<?php echo $cmp->ID;?>','<?php echo $cmp->reservationID;?>','<?php echo $cmp->rent_space_id;?>');return false;">
+            	<button type="button" class="btn btn-xs btn-danger" onclick="delete_pending('<?php echo $cmp->ID;?>','<?php echo $cmp->reservationID;?>','<?php echo $cmp->rent_space_id;?>','<?php echo $cmp->room_type_id;?>');return false;">
   					<span class="glyphicon glyphicon-trash"></span>&nbsp;
 				</button>
             </td>

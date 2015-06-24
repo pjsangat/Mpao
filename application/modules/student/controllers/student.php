@@ -266,18 +266,29 @@ class Student extends CI_Controller {
     }
 
     public function get_compute() {
-        $query = "select A.*,B.user_ID from temporary_cart_pending A
-				left join treservation B
-				on A.reservationID = B.reservationID
+        $query = "select A.*,B.user_ID, C.room_type_id from temporary_cart_pending A
+				left join treservation B on A.reservationID = B.reservationID
+                                INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
 				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
         $data['compute'] = $this->common_model->custom_query($query);
         $this->load->view('compute_charges', $data);
     }
+    
+    public function get_compute_non_ac(){
+        
+        $query = "select A.*,B.user_ID, C.* from temporary_cart_pending A
+				left join treservation B on A.reservationID = B.reservationID
+                                INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
+				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
+        $data['compute'] = $this->common_model->custom_query($query);
+        $this->load->view('compute_charges_nonac', $data);
+        
+    }
 
     public function get_compute_others() {
-        $query = "select A.*,B.user_ID from temporary_cart_pending A
-				left join treservation B
-				on A.reservationID = B.reservationID
+        $query = "select A.*,B.user_ID, C.room_type_id from temporary_cart_pending A
+				left join treservation B on A.reservationID = B.reservationID
+                                INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
 				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
         $data['compute'] = $this->common_model->custom_query($query);
         $this->load->view('compute_charges_others', $data);

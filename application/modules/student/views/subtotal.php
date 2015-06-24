@@ -1,3 +1,4 @@
+<?php if($sub_total > 0){ ?>
 <table class="table">
     <tbody>
         <tr class="bg-success">
@@ -10,8 +11,9 @@
                 <strong><?php echo 'P'.number_format($sub_total, 2, ".", ","); ?></strong>
             </td>
             <td class="col-md-1 text-center">
-
             </td>
         </tr>
     </tbody>
 </table>
+
+<?php } ?>

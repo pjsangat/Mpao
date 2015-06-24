@@ -21,9 +21,9 @@ class Reservation_model extends CI_model {
                 WHERE C.room_type_id = ? AND B.user_ID = ?";
 
         $query = $this->db->query($sql, array($room_type_id, $this->session->userdata('user_id')));
+        $amount = 0;
 
         if ($query->num_rows > 0) {
-            $amount = 0;
 
             foreach ($query->result() as $result) {
 
@@ -36,7 +36,15 @@ class Reservation_model extends CI_model {
                         }
 
                         break;
-
+                        
+                    case 2:
+                        
+                        $rent = $this->db->query("select * from charges where rent_space_id = ? ", array($result->rent_space_id))->row();
+                        for($ctr = 0; $ctr < $result->number_of_guest; $ctr++){
+                            $amount += $rent->amount;
+                        }
+                        
+                        break;
 
 
                     case 3:
@@ -66,8 +74,8 @@ class Reservation_model extends CI_model {
 
         $query = $this->db->query($sql, array($this->session->userdata('user_id')));
 
+        $amount = 0;
         if ($query->num_rows > 0) {
-            $amount = 0;
 
             foreach ($query->result() as $result) {
                 switch ($result->room_type_id) {
@@ -79,7 +87,15 @@ class Reservation_model extends CI_model {
                         }
 
                         break;
-
+                        
+                    case 2:
+                        
+                        $rent = $this->db->query("select * from charges where rent_space_id = ? ", array($result->rent_space_id))->row();
+                        for($ctr = 0; $ctr < $result->number_of_guest; $ctr++){
+                            $amount += $rent->amount;
+                        }
+                        
+                        break;
 
 
                     case 3:
@@ -94,7 +110,6 @@ class Reservation_model extends CI_model {
                 }
             }
         }
-
 
         return $amount;
     }

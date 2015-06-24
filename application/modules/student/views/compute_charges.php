@@ -7,9 +7,7 @@
 			$rent = $this->db->query("select * from charges where rent_space_id = '".$cmp->rent_space_id."'  order by id asc LIMIT ".$cmp->number_of_guest."");
 		$charge_result = $rent->result();
 		$charges = array();
-		
-		foreach($charge_result as $chrg)
-		{
+		foreach($charge_result as $chrg){
 			$charges[] = $chrg->amount;
 			
 		}
@@ -29,12 +27,13 @@
             <td class="col-md-1 text-center"><?php echo $cmp->number_of_guest;?></td>
             <td class="col-md-1 text-center">P<?php $aircon_charges = number_format(array_sum($charges),2); echo $aircon_charges?>
             	<?php 
+       
 					$total = array();
 					$total[] = $aircon_charges; 
 				?>
             </td>
             <td class="col-md-1 text-center">
-            	<button type="button" class="btn btn-xs btn-danger" onclick="delete_pending('<?php echo $cmp->ID;?>','<?php echo $cmp->reservationID;?>','<?php echo $cmp->rent_space_id;?>');return false;">
+            	<button type="button" class="btn btn-xs btn-danger" onclick="delete_pending('<?php echo $cmp->ID;?>','<?php echo $cmp->reservationID;?>','<?php echo $cmp->rent_space_id;?>','<?php echo $cmp->room_type_id;?>');return false;">
   					<span class="glyphicon glyphicon-trash"></span>&nbsp;
 				</button>
             </td>

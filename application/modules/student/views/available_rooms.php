@@ -15,7 +15,7 @@
     });
 
 
-    function reserveaircontest(oForm, room_id)
+    function reserveaircontest(oForm, room_id, room_type_id)
     {
         var reservation_id = '<?php echo $this->uri->segment(4); ?>'
         gender = oForm.elements["gender"].value;
@@ -52,13 +52,14 @@
                 myfunction(room_id, reservation_id);
                 //document.getElementById(oForm.id).reset();
                 grand_total(reservation_id);
+                get_sub_total(room_type_id);
             }
         });
         return false;
         //alert(oForm.name);	
     }
 
-    function otherfacility(oForm, room_id)
+    function otherfacility(oForm, room_id, room_type_id)
     {
         var reservation_id = '<?php echo $this->uri->segment(4); ?>'
         no_of_person = oForm.elements["no_of_person"].value;
@@ -96,6 +97,7 @@
             {
                 get_others(room_id, reservation_id);
                 document.getElementById(oForm.id).reset();
+                get_sub_total(room_type_id);
             }
         });
         return false;
@@ -228,11 +230,14 @@
         return false;
     }
 
-    function nonaircon(oForm)
+    function nonaircon(oForm, room_type_id)
     {
+        var reservation_id = '<?php echo $this->uri->segment(4); ?>';
+        no_of_person = oForm.elements["number_of_person"].value;
         room_id = oForm.elements["room_id"].value;
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
+        number_of_person = oForm.elements["number_of_person"].value;
 
         if (date_time_in == null || date_time_in == "") {
             oForm.elements["date_time_in"].focus();
@@ -245,6 +250,27 @@
             oForm.elements["date_time_out"].focus();
             return false;
         }
+        waiteme('#non_aircon_grid');
+        $.post('<?php echo base_url(); ?>student/reserve_rooms',
+                {
+                    date_time_in: date_time_in,
+                    reservation_id: reservation_id,
+                    date_time_out: date_time_out,
+                    room_id: room_id,
+                    gender: no_of_person,
+                    gender_guest: 2,
+                },
+                function(data) {
+                    $('#non_aircon_grid').waitMe('hide');
+                    if (data == '1')
+                    {
+                        get_nonac(room_id, reservation_id, room_type_id);
+                        //document.getElementById(oForm.id).reset();
+                        grand_total(reservation_id);
+                        get_sub_total(room_type_id);
+                    }
+                });
+
 
         return false;
     }
@@ -278,7 +304,7 @@
         return false;
     }
 
-    function delete_pending(id, reserve_id, room_id)
+    function delete_pending(id, reserve_id, room_id, room_type_id)
     {
         waiteme('#aircon_grid');
         $.post('<?php echo base_url(); ?>student/delete',
@@ -291,6 +317,11 @@
                 myfunction(room_id, reserve_id);
                 get_others(room_id, reserve_id);
                 $('#aircon_grid').waitMe('hide');
+
+                if (room_type_id !== undefined) {
+                    get_sub_total(room_type_id);
+                }
+
             }
         });
         return false;
@@ -306,22 +337,42 @@
                 },
         function(data) {
             $('#computation_' + rent_space_id).html(data);
-            if(room_type_id !== undefined){
-                get_sub_total(room_type_id);                
+            if (room_type_id !== undefined) {
+                get_sub_total(room_type_id);
             }
-            
+
         });
         return false;
     }
-    
-    function get_sub_total(room_type_id){
-        
-        $.get('<?php echo base_url(); ?>student/get_sub_total/'+room_type_id,{},
+
+
+    function get_nonac(rent_space_id, reservation_id, room_type_id)
+    {
+        //alert(rent_space_id);
+        $.post('<?php echo base_url(); ?>student/get_compute_non_ac',
+                {
+                    rent_space_id: rent_space_id,
+                    reservation_id: reservation_id
+                },
         function(data) {
-            $('#sub-total-' + room_type_id).html(data);
+            $('#computation_' + rent_space_id).html(data);
+            if (room_type_id !== undefined) {
+                get_sub_total(room_type_id);
+            }
+
         });
         return false;
-    }       
+    }
+
+    function get_sub_total(room_type_id) {
+
+        $.get('<?php echo base_url(); ?>student/get_sub_total/' + room_type_id, {},
+                function(data) {
+                    $('#sub-total-' + room_type_id).html(data);
+                    grand_total(<?php echo $this->uri->segment(4); ?>);
+                });
+        return false;
+    }
 
     function get_others(rent_space_id, reservation_id, room_type_id)
     {
@@ -332,8 +383,8 @@
                 },
         function(data) {
             $('#computation_others_' + rent_space_id).html(data);
-            
-            if(room_type_id !== undefined){
+
+            if (room_type_id !== undefined) {
                 get_sub_total(room_type_id);
             }
         });
@@ -483,7 +534,7 @@
                                 <td >
                                     <input type="hidden" name="gender_guest" id="gender_guest" value="<?php echo $ai->gender_id; ?>" />
                                     <?php if ($ai->gender_id == '1') { ?>
-                                        <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>');
+                                        <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>', '<?php echo $ai->room_type_id; ?>');
                                                         return false;">
                                             <option selected="selected">Select</option>
                                             <?php
@@ -502,7 +553,7 @@
                                 </td>
                                 <td >
                                     <?php if ($ai->gender_id == '2') { ?>
-                                        <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>');
+                                        <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>', '<?php echo $ai->room_type_id; ?>');
                                                         return false;">
                                             <option selected="selected">Select</option>
                                             <?php
@@ -536,7 +587,7 @@
 
         <div class="panel-body">
             <div class="table-responsive" id="sub-total-1">
-                
+
             </div>
         </div>
     </div>
@@ -579,7 +630,7 @@
                                             <option value="<?php echo $room->rentspace_ID; ?>"><?php echo $room->Name; ?></option>
                                         <?php } ?>
                                     </select>
-                                </td>
+                                </td> 
                                 <td ><div class="input-group date form_datetime_in col-md-9" data-date="" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1" style=" width:250px;" id="startdate_na_<?php echo $nonai->id; ?>">
                                         <input class="form-control"  type="text" value="" name="date_time_in" id="date_time_in" readonly>
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span> <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span> </div></td>
@@ -594,7 +645,7 @@
                                         <?php
                                         //}
                                         ?>
-                                        <select id="number_of_person" name="number_of_person" class="form-control" onchange="nonaircon(this.form);
+                                        <select id="number_of_person" name="number_of_person" class="form-control" onchange="nonaircon(this.form, 2);
                                                     return false;">
                                             <option selected="selected">Select</option>
                                             <?php for ($x = 0; $x <= 20; $x++) { ?>
@@ -605,6 +656,11 @@
                                     </div></td>
                             <input value="0" name="both11" type="hidden">
                             </tr>
+                            <?php foreach ($get_room as $room) { ?>
+                                <tr>
+                                    <td colspan="5" class=""><div id="computation_<?php echo $room->rentspace_ID; ?>"></div><script>get_nonac('<?php echo $room->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $room->room_type_id; ?>');</script></td>
+                                </tr>
+                            <?php } ?>
                         </form>
                         <?php
                     }
@@ -615,6 +671,13 @@
             <!-- /.table-responsive --> 
         </div>
         <!-- /.panel-body --> 
+
+        <div class="panel-body">
+            <div class="table-responsive" id="sub-total-2">
+
+            </div>
+        </div>
+
     </div>
     <!-- /.panel -->
 </div>
@@ -700,14 +763,14 @@
             <!-- /.table-responsive --> 
         </div>
         <!-- /.panel-body --> 
-        
-        
+
+
         <div class="panel-body">
             <div class="table-responsive" id="sub-total-3">
-                
+
             </div>
         </div>
-        
+
         <div class="panel-body">
             <div class="table-responsive" id="grand-total">
                 <table class="table">
@@ -730,6 +793,19 @@
     <!-- /.panel -->
 </div>
 
+
+<div id="others_">
+    <div class="panel panel-primary" id="others" style="text-align: center; padding: 10px;">
+        <input type="checkbox" name="haveread" value="1" id="haveread" style="width: 20px;height: 20px;"/> 
+        <label for="haveread" style="margin: 0px;margin-top: 5px;  vertical-align: top;">I have read and accept <a href='javascript:;'>Terms and Conditions</a></label>
+        
+        <div style="text-align: right;">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+    
+    
+</div>
 
 
 <script type="text/javascript">
