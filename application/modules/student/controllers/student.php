@@ -110,7 +110,7 @@ class Student extends CI_Controller {
             "mobile" => $this->input->post('mobile'),
             "landline" => $this->input->post('landline'),
             "date_activity" => $this->input->post('date'),
-            "statusID" => "1",
+            "statusID" => "0",
             "facilityID" => $this->input->post('facityid')
         );
         if ($this->db->insert('treservation', $datas)) {
@@ -119,17 +119,29 @@ class Student extends CI_Controller {
             echo '0';
         }
     }
+    
+    public function update_status(){
+        
+        if($this->input->post()){
+            $this->load->model('reservation_model', 'reservation');
+            $this->reservation->update_status($this->input->post());
+            $this->reservation->move_to_approval($this->input->post());
+        }
+        
+    }
 
-    public function rooms_available() {
+    public function rooms_available($facility_id, $reservation_id) {
         //$query = "select user_ID from treservation where user_ID = '".$this->session->userdata('user_id')."'";
         //echo $check_user = $this->common_model->custom_count($query);
         //echo $this->session->userdata('user_id');
         //echo $this->uri->segment(4);
-
+        $data['reservation_id'] = $reservation_id;
+        $data['facility_id'] = $facility_id;
+        
         $query_details = "select A.*,B.* from treservation A
 						left join tactivity B
 						on A.activityID = B.activityID
-						 where A.reservationID = '" . $this->uri->segment(4) . "'";
+						 where A.reservationID = '" . $this->uri->segment(4) . "' and A.statusID = 0";
         $airconquery = "select * from trentspace  
 					where Facility_ID = '" . $this->uri->segment(3) . "' and room_type_id = '1' and is_otherfacility = '0'";
 
@@ -143,7 +155,9 @@ class Student extends CI_Controller {
 								on A.unit_id = B.Unit_typeID";
 
         $data['details'] = $this->common_model->single_result_query($query_details);
-
+        if(empty($data['details'])){
+            redirect('/student/calendar/'.$facility_id);
+        }
         $data['aircon'] = $this->common_model->custom_query($airconquery);
         $data['noaircon'] = $this->common_model->custom_query($nonairconquery);
         $data['others'] = $this->common_model->custom_query($other_facilityquery);
@@ -269,7 +283,7 @@ class Student extends CI_Controller {
         $query = "select A.*,B.user_ID, C.room_type_id from temporary_cart_pending A
 				left join treservation B on A.reservationID = B.reservationID
                                 INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
-				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
+				where A.reservationId = '".$this->input->post('reservation_id')."' and A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
         $data['compute'] = $this->common_model->custom_query($query);
         $this->load->view('compute_charges', $data);
     }
@@ -279,7 +293,7 @@ class Student extends CI_Controller {
         $query = "select A.*,B.user_ID, C.* from temporary_cart_pending A
 				left join treservation B on A.reservationID = B.reservationID
                                 INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
-				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
+				where A.reservationId = '".$this->input->post('reservation_id')."' and A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
         $data['compute'] = $this->common_model->custom_query($query);
         $this->load->view('compute_charges_nonac', $data);
         
@@ -289,7 +303,7 @@ class Student extends CI_Controller {
         $query = "select A.*,B.user_ID, C.room_type_id from temporary_cart_pending A
 				left join treservation B on A.reservationID = B.reservationID
                                 INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
-				where A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
+				where A.reservationId = '".$this->input->post('reservation_id')."' and A.rent_space_id = '" . $this->input->post('rent_space_id') . "' and user_ID = '" . $this->session->userdata('user_id') . "'";
         $data['compute'] = $this->common_model->custom_query($query);
         $this->load->view('compute_charges_others', $data);
     }

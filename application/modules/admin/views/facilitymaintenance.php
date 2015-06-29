@@ -127,19 +127,19 @@ $( window ).resize(function() {
 
 
   	           <?php
-                  
-                  if(!empty($this->session->flashdata('uploadmsg')))
+                  $uploadmsg = $this->session->flashdata('uploadmsg');
+                  if(!empty($uploadmsg))
                   {
                       ?>
                   
-                       <font color="green"><?php echo $this->session->flashdata('uploadmsg'); } ?></font>
+                       <font color="green"><?php echo $uploadmsg; } ?></font>
 
                   <?php 
-
-                  if(!empty($this->session->flashdata('uploaderror')))
+                  $uploaderror = $this->session->flashdata('uploaderror');
+                  if(!empty($uploaderror))
                   {
                   ?>
-                      <font color="red"><?php echo $this->session->flashdata('uploaderror'); } ?></font>
+                      <font color="red"><?php echo $uploaderror; } ?></font>
 
                     <?php
                   

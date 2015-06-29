@@ -11,13 +11,13 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
 <script type='text/javascript'>
     $(document).ready(function() {
-        grand_total(<?php echo $this->uri->segment(4); ?>);
+        grand_total(<?php echo $reservation_id; ?>);
     });
 
 
     function reserveaircontest(oForm, room_id, room_type_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>'
+        var reservation_id = '<?php echo $reservation_id; ?>'
         gender = oForm.elements["gender"].value;
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
@@ -61,7 +61,7 @@
 
     function otherfacility(oForm, room_id, room_type_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>'
+        var reservation_id = '<?php echo $reservation_id; ?>'
         no_of_person = oForm.elements["no_of_person"].value;
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
@@ -119,7 +119,7 @@
 
     function reserveaircon(oForm, room_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>'
+        var reservation_id = '<?php echo $reservation_id; ?>'
         gender = oForm.elements["gender"].value;
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
@@ -158,7 +158,7 @@
 
     function reserve_requirments(oForm, requirment_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>';
+        var reservation_id = '<?php echo $reservation_id; ?>';
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
         if (date_time_in == null || date_time_in == "") {
@@ -194,7 +194,7 @@
 
     function reserverothers(oForm, room_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>';
+        var reservation_id = '<?php echo $reservation_id; ?>';
         gender = oForm.elements["gender"].value;
         date_time_in = oForm.elements["date_time_in"].value;
         date_time_out = oForm.elements["date_time_out"].value;
@@ -232,7 +232,7 @@
 
     function nonaircon(oForm, room_type_id)
     {
-        var reservation_id = '<?php echo $this->uri->segment(4); ?>';
+        var reservation_id = '<?php echo $reservation_id; ?>';
         no_of_person = oForm.elements["number_of_person"].value;
         room_id = oForm.elements["room_id"].value;
         date_time_in = oForm.elements["date_time_in"].value;
@@ -369,7 +369,7 @@
         $.get('<?php echo base_url(); ?>student/get_sub_total/' + room_type_id, {},
                 function(data) {
                     $('#sub-total-' + room_type_id).html(data);
-                    grand_total(<?php echo $this->uri->segment(4); ?>);
+                    grand_total(<?php echo $reservation_id; ?>);
                 });
         return false;
     }
@@ -535,7 +535,7 @@
                                     <input type="hidden" name="gender_guest" id="gender_guest" value="<?php echo $ai->gender_id; ?>" />
                                     <?php if ($ai->gender_id == '1') { ?>
                                         <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>', '<?php echo $ai->room_type_id; ?>');
-                                                        return false;">
+                                                return false;">
                                             <option selected="selected">Select</option>
                                             <?php
                                             for ($x = 1; $x <= $count; $x++) {
@@ -554,7 +554,7 @@
                                 <td >
                                     <?php if ($ai->gender_id == '2') { ?>
                                         <select name="gender" class="form-control" id="gender" onchange="reserveaircontest(this.form, '<?php echo $ai->rentspace_ID; ?>', '<?php echo $ai->room_type_id; ?>');
-                                                        return false;">
+                                                return false;">
                                             <option selected="selected">Select</option>
                                             <?php
                                             for ($x = 1; $x <= $count; $x++) {
@@ -572,7 +572,7 @@
                             </center></td>
                             </tr>
                             <tr>
-                                <td colspan="5" class=""><div id="computation_<?php echo $ai->rentspace_ID; ?>"></div><script>myfunction('<?php echo $ai->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $ai->room_type_id; ?>');</script></td>
+                                <td colspan="5" class=""><div id="computation_<?php echo $ai->rentspace_ID; ?>"></div><script>myfunction('<?php echo $ai->rentspace_ID; ?>', '<?php echo $reservation_id; ?>', '<?php echo $ai->room_type_id; ?>');</script></td>
                             </tr>
                         </form> 
                         <?php
@@ -615,7 +615,7 @@
                         </tr>
                         <?php
                         foreach ($noaircon as $nonai) {
-                            $room_query = $this->db->query("select * from trentspace where room_type_id = '2' and gender_id = '" . $nonai->id . "' and Facility_ID = '" . $this->uri->segment(3) . "'");
+                            $room_query = $this->db->query("select * from trentspace where room_type_id = '2' and gender_id = '" . $nonai->id . "' and Facility_ID = '" . $facility_id . "'");
                             $get_room = $room_query->result();
                             ?>
                         <form method="post" id="nonaircon_<?php echo $nonai->id; ?>" name="nonaircon_<?php echo $nonai->id; ?>">
@@ -646,7 +646,7 @@
                                         //}
                                         ?>
                                         <select id="number_of_person" name="number_of_person" class="form-control" onchange="nonaircon(this.form, 2);
-                                                    return false;">
+                                                return false;">
                                             <option selected="selected">Select</option>
                                             <?php for ($x = 0; $x <= 20; $x++) { ?>
                                                 <option value="<?php echo $x; ?>"><?php echo $x; ?></option>
@@ -658,7 +658,7 @@
                             </tr>
                             <?php foreach ($get_room as $room) { ?>
                                 <tr>
-                                    <td colspan="5" class=""><div id="computation_<?php echo $room->rentspace_ID; ?>"></div><script>get_nonac('<?php echo $room->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $room->room_type_id; ?>');</script></td>
+                                    <td colspan="5" class=""><div id="computation_<?php echo $room->rentspace_ID; ?>"></div><script>get_nonac('<?php echo $room->rentspace_ID; ?>', '<?php echo $reservation_id; ?>', '<?php echo $room->room_type_id; ?>');</script></td>
                                 </tr>
                             <?php } ?>
                         </form>
@@ -740,7 +740,7 @@
                                 <td >
 
                                     <select id="no_of_person" name="no_of_person" class="form-control" onchange="otherfacility(this.form, '<?php echo $otherf->rentspace_ID; ?>', '<?php echo $otherf->room_type_id; ?>');
-                                                return false;">
+                                            return false;">
                                         <option selected="selected">Select No of Person</option>
                                         <?php for ($x = 1; $x <= $otherf->No_person_Max; $x++) { ?>
                                             <option value="<?php echo $x; ?>"><?php echo $x; ?></option>
@@ -750,7 +750,7 @@
                             </tr>
                             <tr>
                                 <td colspan="5" class="">
-                                    <div id="computation_others_<?php echo $otherf->rentspace_ID; ?>"></div><script>get_others('<?php echo $otherf->rentspace_ID; ?>', '<?php echo $this->uri->segment(4); ?>', '<?php echo $otherf->room_type_id; ?>');</script>
+                                    <div id="computation_others_<?php echo $otherf->rentspace_ID; ?>"></div><script>get_others('<?php echo $otherf->rentspace_ID; ?>', '<?php echo $reservation_id; ?>', '<?php echo $otherf->room_type_id; ?>');</script>
                                 </td>
                             </tr>
                         </form> 
@@ -798,20 +798,46 @@
     <div class="panel panel-primary" id="others" style="text-align: center; padding: 10px;">
         <input type="checkbox" name="haveread" value="1" id="haveread" style="width: 20px;height: 20px;"/> 
         <label for="haveread" style="margin: 0px;margin-top: 5px;  vertical-align: top;">I have read and accept <a href='javascript:;'>Terms and Conditions</a></label>
-        
+
         <div style="text-align: right;">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" id="submit_reservation" class="btn btn-primary">Submit</button>
         </div>
     </div>
-    
-    
+
+
 </div>
 
 
 <script type="text/javascript">
 
     $(document).ready(function() {
+        $("#submit_reservation").click(function() {
+            if ($("#haveread").prop('checked') == false) {
+                $('.modal-title').html('Reservation');
+                $('.modal-body').html('<div>Please read and accept our Terms and Conditions.</div><div style="text-align:right;"><button type="submit" id="will_read_toc" class="btn btn-primary">Ok</button></div>');
+                $("#add_propertie").modal('show');
+            } else {
+                $.post('<?php echo base_url(); ?>student/update_status',
+                {
+                    reservation_id: <?php echo $reservation_id; ?>,
+                    facility_id: <?php echo $facility_id; ?>,
+                    status: 1
+                },
+                function(data) {
+                    $('.modal-title').html('Reservation');
+                    $('.modal-body').html('<div>Successfully Booked.</div><div style="text-align:right;"><button type="submit" id="booking_success" class="btn btn-primary">Ok</button></div>');
+                    $("#add_propertie").modal('show');
+                });
+            }
+        });
 
+        $("#add_propertie").on('click', '#booking_success', function() {
+            window.location = '<?php echo base_url('student/calendar/'.$facility_id); ?>';
+        });
+
+        $("#add_propertie").on('click', '#will_read_toc', function() {
+            $("#add_propertie").modal('hide');
+        });
         //other facility calendar
         $('#other_facility').find('.form_datetime_in').each(function() {
             var res = this.id.split("_");

@@ -6,91 +6,91 @@
 <script type="text/javascript" language="javascript" src='<?php echo base_url(); ?>assets/js/admin/demo.js'></script>
 
 <style>
-.mygrid-wrapper-div {
-  
-    overflow: scroll;
-}
+    .mygrid-wrapper-div {
 
-  .alignRight { text-align: right; }
+        overflow: scroll;
+    }
+
+    .alignRight { text-align: right; }
 
 
 
 </style>
 
-<?php 
- if (!empty($this->session->flashdata('approvedmsg')))
- {
-?>
-    <div class="alert alert-success"><?php echo $this->session->flashdata('approvedmsg') ?></div>
 <?php
-
-  }
-
+$approvedmsg = $this->session->flashdata('approvedmsg');
+if (!empty($approvedmsg)) {
+    ?>
+    <div class="alert alert-success"><?php echo $approvedmsg; ?></div>
+    <?php
+}
 ?>
 
 
-      <div class="panel panel-primary">
-        <div class="panel-heading">FOR APPROVAL</div>
-        <div class="panel-body">
-
-               
+<div class="panel panel-primary">
+    <div class="panel-heading">FOR APPROVAL</div>
+    <div class="panel-body">
 
 
+
+
+        <?php
+        foreach ($facilityall as $row) {
+            ?>
+
+            <table width="100%" border="1" class="bg-warning">
+                <tr class="bg-danger">
+                    <td height="35" colspan="2" class=""> 
+                        <strong>
                             <?php
-                               foreach ($facilityall as $row) {
+                            echo $row->Facility_name;
+                            $counter = 1;
                             ?>
-
-                            <table width="100%" border="1" class="bg-warning">
-                                <tr class="bg-danger">
-                                  <td height="35" colspan="2" class=""> 
-                                    <strong>
-                                      <?php echo $row->Facility_name; 
-                                       $counter = 1; ?>
-                                    </strong>
-                                  </td>
-                                </tr>
+                        </strong>
+                    </td>
+                </tr>
 
 
-                              <?php foreach ($worklist as $row1) { ?>
+                <?php foreach ($worklist as $row1) { ?>
 
-                                <?php
+                    <?php
+                    if ($row->facility_iD == $row1->id) {
+                        ?>
 
-                                  if($row->facility_iD == $row1->id)
-                                   { ?>
+                        <tr class="bg-danger">
+                            <td width="558" class="bg-info">
+                                <a href="<?php echo base_url(); ?>admin/reserved?reservationid=<?php echo $row1->reservationID; ?>&reservedcartid=<?php echo $row1->cartid; ?>&facility=<?php echo $row->Facility_name; ?>">
 
-                                      <tr class="bg-danger">
-                                        <td width="558" class="bg-info">
-                                          <a href="<?php echo base_url(); ?>admin/reserved?reservationid=<?php echo $row1->reservationID; ?>&reservedcartid=<?php echo $row1->cartid; ?>&facility=<?php  echo $row->Facility_name;?>">
-                                            
-                                                 <?php echo $counter.' '.$row1->Approval; ?>
-                                               
-                                          </a>
-                                        </td>
-                                      </tr>
-                            
-                              <?php }
-                                   $counter = $counter + 1;
-                                } ?>
-                    
-                             </table> 
-                              <p>&nbsp;</p>
+                                    <?php echo $counter . ' ' . $row1->Approval; ?>
+
+                                </a>
+                            </td>
+                        </tr>
+
+                        <?php
+                    }
+                    $counter = $counter + 1;
+                }
+                ?>
+
+            </table> 
+            <p>&nbsp;</p>
 
 
-                            <?php
-        
-                            }
-                            ?>
+            <?php
+        }
+        ?>
 
-                             
-                 
 
-          
 
-            
-        </div>
-      </div>
 
-   
+
+
+
+    </div>
+</div>
+
+
 
 
 <?php
