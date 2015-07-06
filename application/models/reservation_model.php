@@ -198,5 +198,48 @@ class Reservation_model extends CI_model {
 
         return $amount;
     }
+    
+    
+    
+    
+    public function get_reservation($where = array(), $details = false){
+        
+        $this->load->model('facility_model', 'facility');
+        $this->load->model('activity_model', 'activity');
+        $this->load->model('reservation_cart_model', 'reservation_cart');
+        $this->load->model('user_model', 'user');
+        
+        $arrValue = array();
+        
+        if(is_array($where) && !empty($where)){
+            $this->db->where($where);
+        }
+        
+        
+        $query = $this->db->get('treservation');
+        
+        if($query->num_rows > 0){
+            
+            $ctr = 0;
+            foreach($query->result() as $result){
+                
+                $result->client = $this->user->get_by_id($result->user_ID);
+                $result->facility = $this->facility->get_facility_by_id($result->facilityID);
+                $result->activity = $this->activity->get_activity_by_id($result->activityID);
+                
+                if($details){
+                    $result->room_reserves = $this->reservation_cart->get_reservation_cart($result->reservationID);
+                }
+                
+                $arrValue[$ctr] = $result;
+                
+                $ctr++;
+            }
+            return $arrValue;
+        }
+        
+        
+        return false;
+    }
 
 }

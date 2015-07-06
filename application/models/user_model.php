@@ -129,4 +129,21 @@ class User_model extends CI_Model {
 									or A.description LIKE '%".$this->uri->segment(3)."%')");
 		return $query->result();
 	}
+        
+        
+        
+        public function get_by_id($user_id = ''){
+            if(empty($user_id)){
+                return false;
+            }
+            
+            $this->db->where('id', $user_id);
+            $query = $this->db->get('users');
+            
+            if($query->num_rows > 0){
+                return $query->row();
+            }
+            
+            return false;
+        }
 }

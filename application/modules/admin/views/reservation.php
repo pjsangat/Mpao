@@ -54,14 +54,14 @@ if (!empty($approvedmsg)) {
                 <?php foreach ($worklist as $row1) { ?>
 
                     <?php
-                    if ($row->facility_iD == $row1->id) {
+                    if ($row->facility_iD == $row1->facilityID) {
                         ?>
 
                         <tr class="bg-danger">
                             <td width="558" class="bg-info">
-                                <a href="<?php echo base_url(); ?>admin/reserved?reservationid=<?php echo $row1->reservationID; ?>&reservedcartid=<?php echo $row1->cartid; ?>&facility=<?php echo $row->Facility_name; ?>">
+                                <a href="<?php echo base_url(); ?>admin/reservation/reserve/<?php echo $row1->reservationID; ?>">
 
-                                    <?php echo $counter . ' ' . $row1->Approval; ?>
+                                    <?php echo $counter . ' ' . $row1->client->first_name . ' ' .$row1->client->last_name . ' / ' .$row1->name . ' / ' . date('M d, Y', strtotime($row1->date_activity)) . ' / ' . $row1->activity->Activity . '' ; ?>
 
                                 </a>
                             </td>

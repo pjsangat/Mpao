@@ -316,12 +316,6 @@ class Admin extends CI_Controller {
 
 	public function reservation()
 	{
-		$data['title'] = 'Reservation';
-		$data['facilityall'] = $this->getallfacility();
-		$data['worklist'] = $this->getworklist();
-		$this->template
-			->set_layout('student_template')
-			->build('reservation',$data);
 
 	}
 
