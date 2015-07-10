@@ -33,8 +33,9 @@ class Reservation_model extends CI_model {
         $query = $this->db->get('treservation');
         
         if( $query->num_rows > 0 ){
+            $this->load->model('facility_model', 'facility');
             $result = $query->row();
-            
+            $facility = $this->facility->get_facility_by_id($data['facility_id']);
 //            $start_date_time = $this->db->query('select startdate, stime, stime_type from temporary_cart_pending where reservationID = ? order by startdate asc limit 1', array($data['reservation_id']))->row();
 //            $end_date_time = $this->db->query('select enddate, etime, etime_type from temporary_cart_pending where reservationID = ? order by startdate desc limit 1', array($data['reservation_id']))->row();
 //            $max_person = $this->db->query('select max(number_of_guest) as max_person from temporary_cart_pending where reservationID = ? order by startdate desc limit 1', array($data['reservation_id']))->row()->max_person;
@@ -71,6 +72,17 @@ class Reservation_model extends CI_model {
 //            $data['status'] = 'Pending';
 //            $data['statusID'] = 1;
             
+            $cnt = $this->db->query('SELECT count(*) as count FROM treservation_control_no WHERE date = ? AND month = ?', array(date("Y"), date("m")))->row()->count;
+            
+            $data['reservation_id'] = $result->reservationID;
+            $data['date'] = date("y");
+            $data['month'] = date("m");
+            $data['code'] = $facility->Control_Number_Header;
+            $data['control_num'] = $facility->Control_Number_Header.date("y")."-".date("m")."-".str_pad( ($cnt + 1), 4, 0, STR_PAD_LEFT);
+            
+            $this->db->insert('treservation_control_no', $data);
+            
+            $data = array();
             if($cart->num_rows > 0){
                 foreach($cart->result() as $item){
                     
@@ -97,15 +109,15 @@ class Reservation_model extends CI_model {
         
     }
     
-    public function get_sub_total($room_type_id) {
+    public function get_sub_total($room_type_id, $reservation_id, $user_id) {
 
         $sql = "SELECT A.*,B.user_ID
                 FROM temporary_cart_pending A
                 LEFT JOIN treservation B on A.reservationID = B.reservationID
                 INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
-                WHERE C.room_type_id = ? AND B.user_ID = ?";
+                WHERE C.room_type_id = ? AND B.user_ID = ? AND A.reservationID = ?";
 
-        $query = $this->db->query($sql, array($room_type_id, $this->session->userdata('user_id')));
+        $query = $this->db->query($sql, array($room_type_id, $user_id, $reservation_id));
         $amount = 0;
 
         if ($query->num_rows > 0) {
@@ -145,19 +157,18 @@ class Reservation_model extends CI_model {
             }
         }
 
-
         return $amount;
     }
 
-    public function get_total() {
+    public function get_total($reservation_id, $user_id) {
 
         $sql = "SELECT A.*,B.user_ID, C.room_type_id
                 FROM temporary_cart_pending A
                 LEFT JOIN treservation B on A.reservationID = B.reservationID
                 INNER JOIN trentspace C on C.rentspace_ID = A.rent_space_id
-                WHERE B.user_ID = ? ";
+                WHERE B.user_ID = ? AND A.reservationID = ?";
 
-        $query = $this->db->query($sql, array($this->session->userdata('user_id')));
+        $query = $this->db->query($sql, array($user_id, $reservation_id));
 
         $amount = 0;
         if ($query->num_rows > 0) {
@@ -227,12 +238,25 @@ class Reservation_model extends CI_model {
                 $result->facility = $this->facility->get_facility_by_id($result->facilityID);
                 $result->activity = $this->activity->get_activity_by_id($result->activityID);
                 
+                $control = $this->db->query('SELECT control_num FROM treservation_control_no WHERE reservation_id = ?', array($result->reservationID));
+                if($control->num_rows > 0){
+                    $result->control_number = $control->row()->control_num;
+                }else{
+                    $result->control_number = '';
+                }
                 if($details){
                     $result->room_reserves = $this->reservation_cart->get_reservation_cart($result->reservationID);
+                    foreach($result->room_reserves as $reserves){
+                        $result->subtotal_amount[$reserves->rent_space->room_type_id] = $this->get_sub_total($reserves->rent_space->room_type_id, $result->reservationID, $result->user_ID);
+                    }
                 }
+                $result->total_amount = $this->get_total($result->reservationID, $result->user_ID);
                 
-                $arrValue[$ctr] = $result;
-                
+                if($query->num_rows == 1){
+                    $arrValue = $result;
+                }else{
+                    $arrValue[$ctr] = $result;
+                }
                 $ctr++;
             }
             return $arrValue;

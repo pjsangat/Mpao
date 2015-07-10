@@ -374,7 +374,7 @@ class Admin extends CI_Controller {
 
 		if($result)
 		{
-			//$this->sendemail($control,$type,$emailadd,$msgemail);
+			$this->sendemail($control,$type,$emailadd,$msgemail);
 			$this->session->set_flashdata('approvedmsg',$resultmsg);
 			redirect(site_url('admin/reservation'),'refresh');
 		}

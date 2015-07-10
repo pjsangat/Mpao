@@ -26,10 +26,10 @@ class Rent_space_model extends CI_Model{
         if($query->num_rows > 0){
             
             $this->load->model('room_type_model', 'room_type');
+            $this->load->model('reservation_model', 'reservation');
             
             $result = $query->row();
             $result->room_type = $this->room_type->get_room_type($result->room_type_id);
-            
             return $result;
          
         }

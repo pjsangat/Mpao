@@ -52,7 +52,7 @@
                 myfunction(room_id, reservation_id);
                 //document.getElementById(oForm.id).reset();
                 grand_total(reservation_id);
-                get_sub_total(room_type_id);
+                get_sub_total(room_type_id, reservation_id);
             }
         });
         return false;
@@ -97,7 +97,7 @@
             {
                 get_others(room_id, reservation_id);
                 document.getElementById(oForm.id).reset();
-                get_sub_total(room_type_id);
+                get_sub_total(room_type_id, reservation_id);
             }
         });
         return false;
@@ -267,7 +267,7 @@
                         get_nonac(room_id, reservation_id, room_type_id);
                         //document.getElementById(oForm.id).reset();
                         grand_total(reservation_id);
-                        get_sub_total(room_type_id);
+                        get_sub_total(room_type_id, reservation_id);
                     }
                 });
 
@@ -319,7 +319,7 @@
                 $('#aircon_grid').waitMe('hide');
 
                 if (room_type_id !== undefined) {
-                    get_sub_total(room_type_id);
+                    get_sub_total(room_type_id, reserve_id);
                 }
 
             }
@@ -338,7 +338,7 @@
         function(data) {
             $('#computation_' + rent_space_id).html(data);
             if (room_type_id !== undefined) {
-                get_sub_total(room_type_id);
+                get_sub_total(room_type_id, reservation_id);
             }
 
         });
@@ -357,19 +357,18 @@
         function(data) {
             $('#computation_' + rent_space_id).html(data);
             if (room_type_id !== undefined) {
-                get_sub_total(room_type_id);
+                get_sub_total(room_type_id, reservation_id);
             }
 
         });
         return false;
     }
 
-    function get_sub_total(room_type_id) {
-
-        $.get('<?php echo base_url(); ?>student/get_sub_total/' + room_type_id, {},
+    function get_sub_total(room_type_id, reservation_id) {
+        $.get('<?php echo base_url(); ?>student/get_sub_total/' + room_type_id + '/' + reservation_id, {},
                 function(data) {
                     $('#sub-total-' + room_type_id).html(data);
-                    grand_total(<?php echo $reservation_id; ?>);
+                    grand_total(reservation_id);
                 });
         return false;
     }
@@ -385,7 +384,7 @@
             $('#computation_others_' + rent_space_id).html(data);
 
             if (room_type_id !== undefined) {
-                get_sub_total(room_type_id);
+                get_sub_total(room_type_id, reservation_id);
             }
         });
         return false;

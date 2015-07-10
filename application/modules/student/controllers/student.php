@@ -321,7 +321,8 @@ class Student extends CI_Controller {
         //$query_total = "select * from temporary_cart_pending where reservationID = '".$this->input->post('reservation_id')."' and ";
         //$query = $this->common_model->custom_query();
         $this->load->model('reservation_model', 'reservation');
-        $data['total'] = $this->reservation->get_total();
+        $reservation_id = $this->input->post('reservation_id');
+        $data['total'] = $this->reservation->get_total($reservation_id, $this->session->userdata('user_id'));
         
         echo number_format($data['total'], 2, ".", ",");
         exit;
@@ -329,9 +330,9 @@ class Student extends CI_Controller {
         
     }
 
-    public function get_sub_total($room_type_id) {
+    public function get_sub_total($room_type_id, $reservation_id) {
         $this->load->model('reservation_model', 'reservation');
-        $data['sub_total'] = $this->reservation->get_sub_total($room_type_id);
+        $data['sub_total'] = $this->reservation->get_sub_total($room_type_id, $reservation_id, $this->session->userdata('user_id'));
         
         $this->load->view('subtotal', $data);
     }

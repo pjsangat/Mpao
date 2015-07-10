@@ -31,8 +31,11 @@ class Reservation extends CI_Controller {
 
     public function reserve($reservation_id) {
 
-
-
+        $result = $this->reservation->get_reservation( array('reservationID' => $reservation_id), true);
+        $data = array();
+        $data['reservationcartinfo'] = (array)$result;
+        
+        $data['facility'] = $data['reservationcartinfo']['facility']->Facility_name;
         $this->template
                 ->set_layout('student_template')
                 ->build('reservationview', $data);
